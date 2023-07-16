@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Data</title>
+</head>
+<body>
+    <h1>Hapus Data</h1>
+    <p>Apakah Anda yakin ingin menghapus data dengan ID: {{ id }}?</p>
+    <form id="deleteForm" method="delete">
+        <button type="submit">Hapus</button>
+    </form>
+
+    <script>
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            fetch(`/delete/{{ id }}`, {
+                method: 'delete'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

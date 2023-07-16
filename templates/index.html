@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pagination with Search and Filter</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
+    <style>
+        .pagination {
+            margin-top: 10px;
+        }
+
+        .pagination a {
+            padding: 5px 10px;
+            margin-right: 5px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .pagination a.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<h1>Data</h1>
+<form action="{{ url_for('index') }}" method="get">
+    <input type="text" name="search" placeholder="Cari" value="{{ search_query }}">
+    <input type="number" name="min_age" placeholder="Usia Minimal" value="{{ min_age }}">
+    <input type="number" name="max_age" placeholder="Usia Maksimal" value="{{ max_age }}">
+    <input type="text" name="daterange" id="daterange" placeholder="Rentang Tanggal" value="{{ daterange }}">
+    <select name="sort_by">
+        <option value="id" {% if sort_by == 'id' %}selected{% endif %}>ID</option>
+        <option value="nama" {% if sort_by == 'nama' %}selected{% endif %}>Nama</option>
+        <option value="usia" {% if sort_by == 'usia' %}selected{% endif %}>Usia</option>
+    </select>
+    <select name="size">
+        <option value="10" {% if size == 10 %}selected{% endif %}>10</option>
+        <option value="20" {% if size == 20 %}selected{% endif %}>20</option>
+        <option value="50" {% if size == 50 %}selected{% endif %}>50</option>
+    </select>
+    <input type="submit" value="Cari">
+</form>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nama</th>
+        <th>Usia</th>
+        <th>Dibuat Pada</th>
+        <th>Tindakan</th>
+    </tr>
+    {% for item in data %}
+    <tr>
+        <td>{{ item['id'] }}</td>
+        <td>{{ item['nama'] }}</td>
+        <td>{{ item['usia'] }}</td>
+        <td>{{ item['created_at'].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        <td>
+            <a href="{{ url_for('edit', id=item['id']) }}">Edit</a>
+            <a href="{{ url_for('delete', id=item['id']) }}">Hapus</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<div class="pagination">
+    {% if total_pages > 1 %}
+        {% set max_pages = 6 if total_pages > 6 else total_pages %}
+        {% if page <= 5 %}
+            {% for p in range(1, max_pages + 1) %}
+                <a href="{{ url_for('index', search=search_query, page=p, size=size, sort_by=sort_by, min_age=min_age, max_age=max_age, daterange=daterange) }}"
+                   {% if p == page %}class="active"{% endif %}>{{ p }}</a>
+            {% endfor %}
+            {% if total_pages > 6 %}
+                <a href="{{ url_for('index', search=search_query, page=6, size=size, sort_by=sort_by, min_age=min_age, max_age=max_age, daterange=daterange) }}">...</a>
+            {% endif %}
+        {% else %}
+            <a href="{{ url_for('index', search=search_query, page=1, size=size, sort_by=sort_by, min_age=min_age, max_age=max_age, daterange=daterange) }}">1</a>
+            <a href="{{ url_for('index', search=search_query, page=2, size=size, sort_by=sort_by, min_age=min_age, max_age=max_age, daterange=daterange) }}">2</a>
+            <span>...</span>
+            {% set end_page = page + 3 if page + 3 <= total_pages else total_pages %}
+            {% for p in range(page - 2, end_page + 1) %}
+                <a href="{{ url_for('index', search=search_query, page=p, size=size, sort_by=sort_by, min_age=min_age, max_age=max_age, daterange=daterange) }}"
+                   {% if p == page %}class="active"{% endif %}>{{ p }}</a>
+            {% endfor %}
+            {% if page + 3 < total_pages %}
+                <a href="{{ url_for('index', search=search_query, page=total_pages, size=size, sort_by=sort_by, min_age=min_age, max_age=max_age, daterange=daterange) }}">...</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+<br>
+<h2>Tambah Data</h2>
+<form action="{{ url_for('add') }}" method="post">
+    <input type="text" name="nama" placeholder="Nama">
+    <input type="number" name="usia" placeholder="Usia">
+    <input type="submit" value="Tambah">
+</form>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+    $(function () {
+        $('input[name="daterange"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                format: 'YYYY-MM-DD',
+                cancelLabel: 'Hapus'
+            }
+        });
+
+        $('input[name="daterange"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+        });
+
+        $('input[name="daterange"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+    });
+</script>
+</body>
+</html>

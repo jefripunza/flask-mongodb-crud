@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  flask-mongodb-example:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "12122:5000"
+    network_mode: bridge
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

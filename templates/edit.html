@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Data</title>
+</head>
+<body>
+    <h1>Edit Data</h1>
+    <form id="editForm" method="put">
+        <input type="text" name="nama" placeholder="Nama" value="{{ data['nama'] }}">
+        <input type="number" name="usia" placeholder="Usia" value="{{ data['usia'] }}">
+        <button type="submit">Update</button>
+    </form>
+
+    <script>
+        const editForm = document.getElementById('editForm');
+        editForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(editForm);
+            const formDataObject = Object.fromEntries(formData.entries());
+
+            fetch(`/edit/{{ data['id'] }}`, {
+                method: 'put',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formDataObject)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>
