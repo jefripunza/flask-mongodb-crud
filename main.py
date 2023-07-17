@@ -1,11 +1,16 @@
+import os
 import json
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from pymongo import MongoClient
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 app = Flask(__name__)
 
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient(os.environ.get('DATABASE_URL'))
 db = client['python_mongodb_example']
 collection = db['users']
 auto_increment = db['auto_increment']
